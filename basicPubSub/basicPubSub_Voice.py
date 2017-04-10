@@ -157,32 +157,6 @@ myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
 # Connect and subscribe to AWS IoT
 myAWSIoTMQTTClient.connect()
-r = sr.Recognizer()
-with sr.Microphone() as source:
-    while 1:
-        print("Say something!")
-        r.adjust_for_ambient_noise(source)
-        print("set minimum energy threshold to {}".format(r.energy_threshold))
-        audio = r.listen(source)
-        print("Said Something!")
-# Speech recognition using Google Speech Recognition
-        try:
-            # for testing purposes, we're just using the default API key
-            # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-            # instead of `r.recognize_google(audio)`
-            print("You said: " + r.recognize_google(audio))
-            #tts = gTTS(text=r.recognize_google(audio),lang = 'en')
-            tts = gTTS(text= "Bruce is a UX guy! UX is Awesome ! Be like Bruce",lang = 'en')
-            tts.save("good.mp3")
-            os.system("mpg321 good.mp3 &")
-            myAWSIoTMQTTClient.publish("sdk/test/Python", " Bruce is a UX guy! UX is Awesome ! Be like Bruce", 1)
-            myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID " + r.recognize_google(audio), 1)
-        except sr.UnknownValueError:
-            print("Google Speech Recognition could not understand audio")
-        except sr.RequestError as e:
-            print("Could not request results rom Google Speech Recognition service; {0}".format(e))
-
-
 
 #myAWSIoTMQTTClient.subscribe("sdk/test/Python", 1, customCallback)
 #time.sleep(2)
@@ -208,8 +182,44 @@ while continue_reading:
 
         # Print UID
         print ("Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3]))
-	myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3]), 1)
-	time.sleep(1)
+        if str(uid[0]) == "0":
+            myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3]), 1)
+            tts = gTTS(text= "Hello Bruce! Welcome to our Shop Easy Feature and take it easy while shopping. Please provide your request ",lang = 'en')
+            tts.save("good.mp3")
+            os.system("mpg321 good.mp3 &")
+            r = sr.Recognizer()
+            with sr.Microphone() as source:
+                while 1:
+                    print("Say something!")
+                    r.adjust_for_ambient_noise(source)
+                    print("set minimum energy threshold to {}".format(r.energy_threshold))
+                    audio = r.listen(source)
+                    print("Said Something!")
+            # Speech recognition using Google Speech Recognition
+                    try:
+            # for testing purposes, we're just using the default API key
+            # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
+            # instead of `r.recognize_google(audio)`
+                        print("You said: " + r.recognize_google(audio))
+            #tts = gTTS(text=r.recognize_google(audio),lang = 'en')
+                        tts = gTTS(text= "Bruce is a UX guy! UX is Awesome ! Be like Bruce",lang = 'en')
+                        tts.save("good.mp3")
+                        os.system("mpg321 good.mp3 &")
+                        myAWSIoTMQTTClient.publish("sdk/test/Python", " Bruce is a UX guy! UX is Awesome ! Be like Bruce", 1)
+                        myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID " + r.recognize_google(audio), 1)
+                    except sr.UnknownValueError:
+                        print("Google Speech Recognition could not understand audio")
+                    except sr.RequestError as e:
+                        print("Could not request results rom Google Speech Recognition service; {0}".format(e))
+
+
+
+            time.sleep(1)
+        else:
+                tts = gTTS(text= "Hello Customer, Sorry! We are unable to match your credentials in our system. To Shop easy, please contact the store owner and leave the rest to us. See you soon!",lang = 'en')
+                tts.save("good.mp3")
+                os.system("mpg321 good.mp3 &")
+                
 			#"Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
             #print "welcome hari"
         # This is the default key for authentication
