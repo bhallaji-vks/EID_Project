@@ -27,6 +27,7 @@ import speech_recognition as sr
 import pyaudio
 from gtts import gTTS
 import os
+import socket
 
 continue_reading = True
 
@@ -190,6 +191,15 @@ while continue_reading:
             r = sr.Recognizer()
             with sr.Microphone() as source:
                 while 1:
+                    UDP_IP = "10.201.12.236"
+                    UDP_Port = 5005
+                    MESSAGE = "Triggering Camera Module for Object detection"
+                    print "Customer End Raspberry Pi "
+                    print "UDP Target IP:", UDP_IP
+                    print "UDP Target Port:", UDP_Port
+                    print "Trigger Camera Module for Object detection", 
+                    sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+                    sock.sendto(MESSAGE, (UDP_IP, UDP_Port))
                     print("Say something!")
                     r.adjust_for_ambient_noise(source)
                     print("set minimum energy threshold to {}".format(r.energy_threshold))
@@ -201,12 +211,13 @@ while continue_reading:
             # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
             # instead of `r.recognize_google(audio)`
                         print("You said: " + r.recognize_google(audio))
-            #tts = gTTS(text=r.recognize_google(audio),lang = 'en')
+                        #tts = gTTS(text=r.recognize_google(audio),lang = 'en')
                         tts = gTTS(text= "Bruce is a UX guy! UX is Awesome ! Be like Bruce",lang = 'en')
                         tts.save("good.mp3")
                         os.system("mpg321 good.mp3 &")
                         myAWSIoTMQTTClient.publish("sdk/test/Python", " Bruce is a UX guy! UX is Awesome ! Be like Bruce", 1)
-                        myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID " + r.recognize_google(audio), 1)
+                        time.sleep(1)
+                       # myAWSIoTMQTTClient.publish("sdk/test/Python", "RFID " + r.recognize_google(audio), 1)
                     except sr.UnknownValueError:
                         print("Google Speech Recognition could not understand audio")
                     except sr.RequestError as e:
@@ -214,11 +225,12 @@ while continue_reading:
 
 
 
-            time.sleep(1)
+            
         else:
                 tts = gTTS(text= "Hello Customer, Sorry! We are unable to match your credentials in our system. To Shop easy, please contact the store owner and leave the rest to us. See you soon!",lang = 'en')
                 tts.save("good.mp3")
                 os.system("mpg321 good.mp3 &")
+                break
                 
 			#"Card read UID: "+str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
             #print "welcome hari"
